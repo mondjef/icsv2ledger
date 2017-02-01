@@ -832,7 +832,8 @@ def main():
                     # perform regexp substitution if captures were used
                     if match.groups():
                         payee = m[0].sub(m[1],entry.desc)
-                    account, tags = m[2], m[3]
+                        account = m[0].sub(m[2],entry.desc)
+                    tags = m[3]
                     found = True
 
         modified = False
