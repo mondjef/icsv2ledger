@@ -90,7 +90,7 @@ Options can either be used from command line or in configuration file.
                           ledger file where to read payees/accounts
     --mapping-file FILE   file which holds the mappings
     --accounts-file FILE  file which holds a list of defined accounts to be used
-    --strict              similar to ledger strict mode, allows only accounts defined in --accounts-file and/or --ledger-file to be used
+    --strict, -s          similar to ledger strict mode, allows only accounts defined in --accounts-file and/or --ledger-file to be used
     --quiet, -q           do not prompt if account can be deduced
     --reverse             reverse the order of entries in the CSV file
     --skip-dupes          detect transactions that have already been imported and skip
@@ -291,7 +291,7 @@ The file used will be first found in that order:
 2. `.icsv2ledgerrc-accounts` in current directory,
 3. `.icsv2ledgerrc-accounts` in home directory.
 
-**`--strict`**
+**`--strict, -s`**
 
 this option forces behaviour similiar to ledger strict mode in that it forces the use of only accounts defined in `--accounts-file` and/or previously used in existing transactions parsed from the `--ledger-file`.  Use of `--accounts-file` option is highly recommended with the use of this option for it to be effective.
 
