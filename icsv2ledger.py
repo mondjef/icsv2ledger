@@ -111,7 +111,8 @@ DEFAULTS = dotdict({
     'ledger_decimal_comma': False,
     'skip_older_than': str(-1),
     'prompt_add_mappings': False,
-    'entry_review': False})
+    'entry_review': False,
+    'strict': False})
 
 FILE_DEFAULTS = dotdict({
     'config_file': [
@@ -416,6 +417,12 @@ def parse_args_and_config_file():
         '--entry-review',
         action='store_true',
         help=('displays transaction summary and request confirmation before committing to ledger'
+              ' (default: {0})'.format(DEFAULTS.entry_review)))
+    
+    parser.add_argument(
+        '--strict', '-s',
+        action='store_true',
+        help=('uses ledger strict mode ensuring only defined accounts be allowed'
               ' (default: {0})'.format(DEFAULTS.entry_review)))
 
     args = parser.parse_args(remaining_argv)
