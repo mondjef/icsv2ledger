@@ -132,7 +132,7 @@ Account`.
 
 **`--src-account STR`**
 
-similar to --acount option, it is the ledger account used as source for ledger transactions but allows the --account option to be overriden after the config file has been parsed.  This is a command-line only option and must not be provided in any section of the config file.  Use of this option allows users to treat sections of the config file as generic import recipes that can be used to import all files that use the same layout while providing a means to specify the ledger source account to use during the importing of transactions.  If `--strict` mode option is also specified then the src-account will be verified that it has been defined as a valid account before proceeding, otherwise if not found a warning will be displayed and prompted to continue. 
+similar to --acount option, it is the ledger account used as source for ledger transactions but allows the `--account` option to be overriden after the config file has been parsed.  This is a command-line only option and must not be provided in any section of the config file.  Use of this option allows users to treat sections of the config file as generic import recipes that can be used to import all files that use the same layout while providing a means to specify the ledger source account to use during the importing of transactions.  If `--strict` mode option is also specified then the src-account will be verified that it has been defined as a valid account before proceeding, otherwise if not found a warning will be displayed and prompted to continue. 
 
 **`--clear-screen, -C`**
 
