@@ -841,7 +841,20 @@ def main():
             ec = 1
     if ec == 1:
         sys.exit(0)
-            
+    
+    # check if account/src_account is an account that has been previously referenced
+    # if not warn user and prompt before continuing
+    acct_tmp = options.account.strip()
+    if options.src_account:
+        acct_tmp = options.src_account.strip()
+    if acct_tmp not in possible_accounts:
+        value = 'N'
+        yn_response = prompt_for_value('Warning: source account not recognized, continue?', possible_yesno, 'N')
+            if yn_response:
+                value = yn_response
+            if value.upper().strip() not in ('Y','YES'):
+                sys.exit(0)
+    
     def get_payee_and_account(entry):
         payee = entry.desc
         account = options.default_expense
