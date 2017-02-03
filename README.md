@@ -90,7 +90,7 @@ Options can either be used from command line or in configuration file.
                           ledger file where to read payees/accounts
     --mapping-file FILE   file which holds the mappings
     --accounts-file FILE  file which holds a list of defined accounts to be used
-    --strict, -s          similar to ledger strict mode, allows only accounts defined in --accounts-file and/or --ledger-file to be used
+    --strict, -s          similar to ledger strict mode, allows only accounts defined in --accounts-file to be allowed
     --quiet, -q           do not prompt if account can be deduced
     --reverse             reverse the order of entries in the CSV file
     --skip-dupes          detect transactions that have already been imported and skip
@@ -132,7 +132,7 @@ Account`.
 
 **`--src-account STR`**
 
-similar to --acount option, it is the ledger account used as source for ledger transactions but allows the `--account` option to be overriden after the config file has been parsed.  This is a command-line only option and must not be provided in any section of the config file.  Use of this option allows users to treat sections of the config file as generic import recipes that can be used to import all files that use the same layout while providing a means to specify the ledger source account to use during the importing of transactions.  If `--strict` mode option is also specified then the src-account will be verified that it has been defined as a valid account before proceeding, otherwise if not found a warning will be displayed and prompted to continue. 
+similar to `--acount` option, it is the ledger account used as source for ledger transactions but allows the `--account` option to be overriden after the config file has been parsed.  This is a command-line only option and must not be provided in any section of the config file.  Use of this option allows users to treat sections of the config file as generic import recipes that can be used to import all files that use the same layout while providing a means to specify the ledger source account to use during the importing of transactions.  If `--strict` mode option is also specified then the src-account will be verified that it has been defined as a valid account before proceeding, otherwise if not found a warning will be displayed and prompted to continue. 
 
 **`--clear-screen, -C`**
 
@@ -270,6 +270,8 @@ The file used will be first found in that order:
 
 is the file which holds the mapping between the description and the
 payee/account names to use. See section [Mapping file](#mapping-file).
+If `--strict` option is used only mappings with a valid account will be accepted, 
+all others will be ignored.
 
 The file used will be first found in that order:
 
@@ -283,6 +285,8 @@ Warning: the file must exists so that mappings are added to the file.
 
 is an optional file that can be used to hold a master list of all
 account names, and will be used as a source for account names.
+Use `--strict` option in addition to this option to force transactions 
+to only use accounts defined in `--accounts-file`.
 See section [Accounts file](#accounts-file).
 
 The file used will be first found in that order:
@@ -293,7 +297,7 @@ The file used will be first found in that order:
 
 **`--strict, -s`**
 
-this option forces behaviour similiar to ledger strict mode in that it forces the use of only accounts defined in `--accounts-file` and/or previously used in existing transactions parsed from the `--ledger-file`.  Use of `--accounts-file` option is highly recommended with the use of this option for it to be effective.
+this option forces behaviour similiar to ledger strict mode in that it forces the use of only accounts defined in `--accounts-file`.  `--accounts-file` option must be provided if using this option.  Use of this option also ensures that the source ledger account either specified by `--account` option from command-line or configuration file or use of the `--src-account` command-line option is an allowed account.
 
 **`--quiet, -q`**
 
