@@ -790,34 +790,58 @@ def reset_stdin():
 
 
 def main():
-
     options = parse_args_and_config_file()
     # Define responses to yes/no prompts
     possible_yesno =  set(['Y','N'])
 
-    # Get list of accounts and payees from Ledger specified file
+    # Get list of accounts and payees and tags
     possible_accounts = set([])
     possible_payees = set([])
     possible_tags = set([])
+    
+    # Accounts file account file
+    if options.accounts_file:
+        possible_accounts.update(read_accounts_file(options.accounts_file))
+
+    # Accounts, payees from ledger file
     if options.ledger_file:
-        possible_accounts = accounts_from_ledger(options.ledger_file)
+        if not options.strict:
+            possible_accounts.update(accounts_from_ledger(options.ledger_file))
         possible_payees = payees_from_ledger(options.ledger_file)
         csv_comments, md5sum_hashes = csv_md5sum_from_ledger(options.ledger_file)
-
-    # Read mappings
+    
+    # Accounts, payees, tags from mappings file
     mappings = []
     if options.mapping_file:
         mappings = read_mapping_file(options.mapping_file)
 
-    if options.accounts_file:
-        possible_accounts.update(read_accounts_file(options.accounts_file))
-
     # Add to possible values the ones from mappings
     for m in mappings:
-        possible_payees.add(m[1])
-        possible_accounts.add(m[2])
-        possible_tags.update(set(m[3]))
+        # if using strict mode remove any mappings that reference an invalid account    
+        if options.strict and m[2] not in possible_accounts:
+            mappings.remove(m)
+        else:
+            possible_payees.add(m[1])
+            possible_accounts.add(m[2])
+            possible_tags.add(m[3])
 
+    ec = 0
+    if options.strict:
+        if not options.accounts_file:
+            print('Must supply accounts file if using --strict mode.')
+            ec = 1
+        else if not possible_accounts:
+            print('--strict mode used and not accounts read from accounts file.')
+            ec = 1
+        else if options.src_account and options.src_account.strip() not in possible_accounts:
+            print('--strict mode used and ' + options.src_account + ' not recognized as valid account.')
+            ec = 1
+        else if options.account and options.account.strip() not in possible_accounts:
+            print('--strict mode used and ' + options.account + ' not recognized as valid account.')
+            ec = 1
+    if ec == 1:
+        sys.exit(0)
+            
     def get_payee_and_account(entry):
         payee = entry.desc
         account = options.default_expense
@@ -834,7 +858,6 @@ def main():
                 # If the pattern isn't a string it's a regex
                 match = m[0].match(entry.desc)
                 if match:
-                #if m[0].match(entry.desc):
                     payee = m[1]
                     # perform regexp substitution if captures were used
                     if match.groups():
@@ -854,10 +877,17 @@ def main():
             if value:
                 modified = modified if modified else value != payee
                 payee = value
-            value = prompt_for_value('Account', possible_accounts, account)
-            if value:
+            
+            while True:
+                value = prompt_for_value('Account', possible_accounts, account)
+                if value:
+                    if value.strip in possible_accounts:
+                        break
+                    else:
+                        print('--strict mode in use, account specified not in accounts file.')
                 modified = modified if modified else value != account
                 account = value
+            
             if options.tags:
                 value = prompt_for_tags('Tag', possible_tags, tags)
                 if value:
