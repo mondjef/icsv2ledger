@@ -823,24 +823,24 @@ def main():
         else:
             possible_payees.add(m[1])
             possible_accounts.add(m[2])
-            possible_tags.add(m[3])
+            possible_tags.update(set(m[3]))
 
     ec = 0
     if options.strict:
         if not options.accounts_file:
             print('Must supply accounts file if using --strict mode.')
             ec = 1
-        else if not possible_accounts:
-            print('--strict mode used and not accounts read from accounts file.')
+        elif not possible_accounts:
+            print('--strict mode used and not accounts read from accounts file ' + options.accounts_file)
             ec = 1
-        else if options.src_account and options.src_account.strip() not in possible_accounts:
+        elif options.src_account and options.src_account.strip() not in possible_accounts:
             print('--strict mode used and ' + options.src_account + ' not recognized as valid account.')
             ec = 1
-        else if options.account and options.account.strip() not in possible_accounts:
+        elif options.account and options.account.strip() not in possible_accounts:
             print('--strict mode used and ' + options.account + ' not recognized as valid account.')
             ec = 1
     if ec == 1:
-        sys.exit(0)
+        sys.exit(1)
     
     # check if account/src_account is an account that has been previously referenced
     # if not warn user and prompt before continuing
@@ -849,11 +849,11 @@ def main():
         acct_tmp = options.src_account.strip()
     if acct_tmp not in possible_accounts:
         value = 'N'
-        yn_response = prompt_for_value('Warning: source account not recognized, continue?', possible_yesno, 'N')
-            if yn_response:
-                value = yn_response
-            if value.upper().strip() not in ('Y','YES'):
-                sys.exit(0)
+        yn_response = prompt_for_value('Warning: source account ' + acct_tmp + ' not recognized, continue?', possible_yesno, 'N')
+        if yn_response:
+            value = yn_response
+        if value.upper().strip() not in ('Y','YES'):
+            sys.exit(0)
     
     def get_payee_and_account(entry):
         payee = entry.desc
@@ -895,11 +895,13 @@ def main():
                 value = prompt_for_value('Account', possible_accounts, account)
                 if value:
                     if value.strip in possible_accounts:
+                        modified = modified if modified else value != account
+                        account = value
                         break
                     else:
                         print('--strict mode in use, account specified not in accounts file.')
-                modified = modified if modified else value != account
-                account = value
+                else:
+                    break
             
             if options.tags:
                 value = prompt_for_tags('Tag', possible_tags, tags)
