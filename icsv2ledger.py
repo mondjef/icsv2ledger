@@ -872,10 +872,11 @@ def main():
                 match = m[0].match(entry.desc)
                 if match:
                     payee = m[1]
-                    # perform regexp substitution if captures were used
-                    if match.groups():
-                        payee = m[0].sub(m[1],entry.desc)
-                        account = m[0].sub(m[2],entry.desc)
+                    account = m[2]
+                    # perform substitution using replace() instead of re.sub as to not impact matching method
+                    for i in range(len(match.groups())):
+                        payee = payee.replace('\\' + str(i+1),match.group(i+1))
+                        account = account.replace('\\' + str(i+1),match.group(i+1
                     tags = m[3]
                     found = True
 
@@ -894,12 +895,15 @@ def main():
             while True:
                 value = prompt_for_value('Account', possible_accounts, account)
                 if value:
-                    if value.strip in possible_accounts:
+                    if value.strip() not in possible_accounts:
+                        print('--strict mode in use, account specified not in accounts file.')
+                        yn_response = prompt_for_value('Override --strict mode?', possible_yesno, 'N')
+                        if not yn_response:
+                            yn_response = 'N'
+                    if yn_response.upper().strip() in ('Y','YES') or value.strip() in possible_accounts:
                         modified = modified if modified else value != account
                         account = value
                         break
-                    else:
-                        print('--strict mode in use, account specified not in accounts file.')
                 else:
                     break
             
